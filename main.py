@@ -26,13 +26,12 @@ def create_csv(name_csv, header):
 
 # writes the data from the dictionary passed in through the buy function, to bought.csv 
 # writes the "amount" from the buy function to the same number of rows in bought.csv
-# TO DO: ids must increment by 1 (instead of all the same ids)
 
-def write_to_bought(bought_dict, amount): # new_product_dict and amount from buy function get passed in
-    for i in range(amount):
-        with open('bought.csv', 'a', newline='') as csv_file:
-            csv_writer = csv.DictWriter(csv_file, fieldnames=header_bought)
-            csv_writer.writerow(bought_dict)
+def write_to_bought(bought_dict): # new_product_dict from buy function gets passed in
+    with open('bought.csv', 'a', newline='') as csv_file:
+        csv_writer = csv.DictWriter(csv_file, fieldnames=header_bought)
+        csv_writer.writerow(bought_dict)
+        
 
 # writes the data from the dictionary passed in through the buy function, to inventory.csv
 # writes the "amount" from the buy function to the same number of rows in inventory.csv
@@ -67,8 +66,11 @@ def buy(prod_name: str, buy_price: float, buy_date: str, exp_date: str, amount: 
         "buy_date": buy_date,
         "exp_date": exp_date,
     }
-
-    write_to_bought(new_product_dict, amount)
+    for i in range(amount):
+        old_id = new_product_dict["product_id"]
+        new_id = old_id + 1
+        new_product_dict["product_id"] = new_id
+        write_to_bought(new_product_dict)
 
     product_dict_inv = {
         "product_id": id,
@@ -131,8 +133,8 @@ def main():
     #create_csv("sold.csv", header_sold)
     
     buy("shampoobar", 2.32, "2021-02-02", "2025-03-02", 5)
-    # buy("peanut", 0.03, "2021-01-15", "2030-03-02", 500)
-    # buy("apple", 0.87, "2021-06-11", "2021-06-25", 100)
+    buy("peanut", 0.03, "2021-01-15", "2030-03-02", 4)
+    buy("apple", 0.87, "2021-06-11", "2021-06-25", 7)
     # sell("apple", "2021-11-11", 2.00, 5)
 
     #print(read_csv())
