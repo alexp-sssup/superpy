@@ -10,13 +10,13 @@ import pandas as pd
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
-# Code for bought.csv
 current_date = datetime.today().strftime('%Y-%m-%d')
 
-header_bought       = ["product_id", "product_name", "buy_price", "buy_date", "exp_date", "amount"]
-header_inventory    = ["product_id", "product_name", "exp_date", "amount"]
-header_sold         = ["product_id", "bought_id",  "product_name", "sell_date", "sell_price", "amount"]
+header_bought       = ["product_id", "product_name", "buy_price", "buy_date", "exp_date"]
+header_inventory    = ["product_id", "product_name", "exp_date"]
+header_sold         = ["product_id", "bought_id",  "product_name", "sell_date", "sell_price"]
 
+# one function to create needed csv files on load
 def create_csv(name_csv, header):
     current_dir = os.getcwd() + ("/" + name_csv)
     if not os.path.exists(current_dir):
@@ -24,17 +24,24 @@ def create_csv(name_csv, header):
             csv_writer = csv.DictWriter(csv_file, fieldnames=header)
             csv_writer.writeheader()
 
-def write_to_bought(bought_dict):
+# writes the data from the dictionary passed in through the buy function, to bought.csv 
+# TO DO: convert the "amount" to the same number of rows in bought.csv
+
+def write_to_bought(bought_dict): # new_product_dict from buy function gets passed in
     with open('bought.csv', 'a', newline='') as csv_file:
         csv_writer = csv.DictWriter(csv_file, fieldnames=header_bought)
         csv_writer.writerow(bought_dict)
 
-def write_to_inventory(bought_dict):
+# writes the data from the dictionary passed in through the buy function, to inventory.csv 
+def write_to_inventory(bought_dict): # product_dict_inv from buy function gets passed in
     with open('inventory.csv', 'a', newline='') as csv_file:
         csv_writer = csv.DictWriter(csv_file, fieldnames=header_inventory)
         csv_writer.writerow(bought_dict)
 
-def write_to_sold(sold_dict):
+# writes the data from the dictionary passed in through the sell function, to sold.csv
+# TO DO: convert the "amount" to the same number of rows in sold.csv
+# TO DO: deletes the data from the dictionary passed in through the sell function, from inventory.csv 
+def write_to_sold(sold_dict): # new_product_dict from sell function gets passed in
     with open('sold.csv', 'a', newline='') as csv_file:
         csv_writer = csv.DictWriter(csv_file, fieldnames=header_sold)
         csv_writer.writerow(sold_dict)
@@ -53,7 +60,7 @@ def buy(prod_name: str, buy_price: float, buy_date: str, exp_date: str, amount: 
         "buy_price": buy_price,
         "buy_date": buy_date,
         "exp_date": exp_date,
-        "amount": amount
+        
     }
 
     write_to_bought(new_product_dict)
@@ -62,7 +69,7 @@ def buy(prod_name: str, buy_price: float, buy_date: str, exp_date: str, amount: 
         "product_id": id,
         "product_name": prod_name,
         "exp_date": exp_date,
-        "amount": amount
+        
     }
     
     write_to_inventory(product_dict_inv)
@@ -108,8 +115,10 @@ def sort_inventory_exp_date():
     inventory = pd.read_csv("inventory.csv")
     inventory["exp_date"] = pd.to_datetime(inventory["exp_date"], infer_datetime_format=True)
     inventory.sort_values(by="exp_date", ascending=True, inplace=True)
+
+    return inventory
     
-    inventory.to_csv("inventory.csv", index=False)
+    
 
 
         
